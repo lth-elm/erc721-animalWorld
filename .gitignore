@@ -3,6 +3,7 @@
 
 ### Node ###
 # Logs
+logContract.txt
 logs
 *.log
 npm-debug.log*
