@@ -5,10 +5,12 @@ import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 
 contract AnimalsWorld is ERC721 {
+
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIds;
 
     address owner;
+    uint private randNonce = 3; // init for no reason at 3
 
     struct animalStruct {
         string animalName;
@@ -28,7 +30,8 @@ contract AnimalsWorld is ERC721 {
     }
 
 
-    function declareAnimal(string memory tokenURI, string memory animalName, string memory gender, uint8 age, uint8 wingsNumber, uint8 legsNumber, uint8 eyesNumber)
+    // Anyone can create his own animal
+    function declareAnimal(string memory animalName, string memory gender, uint8 age, uint8 wingsNumber, uint8 legsNumber, uint8 eyesNumber)
         public
         returns (uint256)
     {
@@ -39,7 +42,7 @@ contract AnimalsWorld is ERC721 {
 
         uint256 newAnimalId = _tokenIds.current();
         _mint(msg.sender, newAnimalId);
-        _setTokenURI(newAnimalId, tokenURI);
+        // _setTokenURI(newAnimalId, tokenURI);
 
         registerBreeder[newAnimalId] = msg.sender;
 
@@ -57,24 +60,25 @@ contract AnimalsWorld is ERC721 {
     }
 
 
-    function breedAnimal(string memory tokenURI, string memory newAnimalName, uint256 animal_one, uint256 animal_two) 
+    // Create an animal by mixing two existing one and their characteristics
+    function breedAnimal(string memory newAnimalName, uint256 animal_one, uint256 animal_two) 
         public 
         returns (uint256) 
     {
-        require (registerBreeder[animal_one] == msg.sender && registerBreeder[animal_two] == msg.sender, "One or both of the animals doesn't belong to you");
-        require (keccak256(abi.encode(animalCharacteristic[animal_one].gender)) != keccak256(abi.encode(animalCharacteristic[animal_two].gender)), "Animals can't have the same gender to breed");
+        require (registerBreeder[animal_one] == msg.sender && registerBreeder[animal_two] == msg.sender, "One or both of the animals doesn't belong to you.");
+        require (keccak256(abi.encode(animalCharacteristic[animal_one].gender)) != keccak256(abi.encode(animalCharacteristic[animal_two].gender)), "Animals can't have the same gender to breed.");
 
         _tokenIds.increment();
 
         uint256 newAnimalId = _tokenIds.current();
         _mint(msg.sender, newAnimalId);
-        _setTokenURI(newAnimalId, tokenURI);
+        // _setTokenURI(newAnimalId, tokenURI);
 
         registerBreeder[newAnimalId] = msg.sender;
 
         string memory newGender;
 
-        if ((animal_one + animal_two) % 2 == 0) {
+        if (random() == 0) {
             newGender = "male";
         } else {
             newGender = "femele";
@@ -91,9 +95,15 @@ contract AnimalsWorld is ERC721 {
     }
 
 
-    // require that the caller own the animal
+    function random() public returns (uint) {
+        randNonce++;
+        uint _random = uint(keccak256(abi.encodePacked(block.timestamp, msg.sender, randNonce)));
+        return _random % 2;
+    } 
+
+
     modifier onlyAnimalOwner(uint256 animalId) { 
-        require (registerBreeder[animalId] == msg.sender, "You don't own this animal"); // also imply that it exist
+        require (registerBreeder[animalId] == msg.sender, "You don't own this animal."); // also imply that it exist
         _;
     }
 }
