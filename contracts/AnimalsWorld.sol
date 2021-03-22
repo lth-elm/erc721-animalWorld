@@ -67,23 +67,13 @@ contract AnimalsWorld is ERC721 {
         require (registerBreeder[animal_one] == msg.sender && registerBreeder[animal_two] == msg.sender, "One or both of the animals doesn't belong to you.");
         require (keccak256(abi.encode(animalCharacteristic[animal_one].gender)) != keccak256(abi.encode(animalCharacteristic[animal_two].gender)), "Animals can't have the same gender to breed.");
 
-        _tokenIds.increment();
-
-        uint256 newAnimalId = _tokenIds.current();
-        _mint(msg.sender, newAnimalId);
-
-        registerBreeder[newAnimalId] = msg.sender;
-
         uint8 newWingsNumber = (animalCharacteristic[animal_one].wingsNumber + animalCharacteristic[animal_two].wingsNumber) / 2;
         uint8 newLegsNumber = (animalCharacteristic[animal_one].legsNumber + animalCharacteristic[animal_two].legsNumber) / 2;
         uint8 newEyesNumber = (animalCharacteristic[animal_one].eyesNumber + animalCharacteristic[animal_two].eyesNumber) / 2;
         string memory newGender;
         newGender = random() == 0 ? "male" : "femele";       
 
-        animalStruct memory newAnimal = animalStruct(newAnimalName, newGender, 0, newWingsNumber, newLegsNumber, newEyesNumber);
-        animalCharacteristic[newAnimalId] = newAnimal;
-
-        return newAnimalId;
+        return declareAnimal(newAnimalName, newGender, 0, newWingsNumber, newLegsNumber, newEyesNumber);
     }
 
 
