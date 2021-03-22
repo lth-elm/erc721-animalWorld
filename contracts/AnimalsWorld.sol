@@ -42,7 +42,6 @@ contract AnimalsWorld is ERC721 {
 
         uint256 newAnimalId = _tokenIds.current();
         _mint(msg.sender, newAnimalId);
-        // _setTokenURI(newAnimalId, tokenURI);
 
         registerBreeder[newAnimalId] = msg.sender;
 
@@ -72,21 +71,14 @@ contract AnimalsWorld is ERC721 {
 
         uint256 newAnimalId = _tokenIds.current();
         _mint(msg.sender, newAnimalId);
-        // _setTokenURI(newAnimalId, tokenURI);
 
         registerBreeder[newAnimalId] = msg.sender;
 
-        string memory newGender;
-
-        if (random() == 0) {
-            newGender = "male";
-        } else {
-            newGender = "femele";
-        }
-        
         uint8 newWingsNumber = (animalCharacteristic[animal_one].wingsNumber + animalCharacteristic[animal_two].wingsNumber) / 2;
         uint8 newLegsNumber = (animalCharacteristic[animal_one].legsNumber + animalCharacteristic[animal_two].legsNumber) / 2;
         uint8 newEyesNumber = (animalCharacteristic[animal_one].eyesNumber + animalCharacteristic[animal_two].eyesNumber) / 2;
+        string memory newGender;
+        newGender = random() == 0 ? "male" : "femele";       
 
         animalStruct memory newAnimal = animalStruct(newAnimalName, newGender, 0, newWingsNumber, newLegsNumber, newEyesNumber);
         animalCharacteristic[newAnimalId] = newAnimal;
