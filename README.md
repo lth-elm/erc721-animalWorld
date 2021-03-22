@@ -32,9 +32,9 @@ Grâce à l'import du fichier *ERC721.sol* de la librairie d'openzeppelin on a p
 
 ## Mon animal <a name="animal"></a>
 
-Toute personne peut en faisant appel au contrat créer son propre *animal* dont les charactéristiques sont enregistrés dans un mapping de la sorte ```mapping(uint256 => animalStruct) public animalCharacteristic``` qui associent la structure d'un animal à son identifiant. De la même manière chaque identifiant d'animal est associé à l'adresse de son possesseur dans un mapping ```registerBreeder```.
+Toute personne peut en faisant appel au contrat créer son propre *animal* dont les charactéristiques sont enregistrés dans un mapping de la sorte ```mapping(uint256 => animalStruct) public animalCharacteristic``` qui associent la structure d'un animal à son identifiant. De la même manière chaque *identifiant* d'animal est associé à l'*adresse* de son possesseur dans un mapping ```registerBreeder```.
 
-La fonction permettant de créer son animal est la suivante.
+La fonction permettant de créer son animal est la suivante :
 
 ```solidity
 function declareAnimal(string memory animalName, string memory gender, uint8 age, uint8 wingsNumber, uint8 legsNumber, uint8 eyesNumber)
@@ -60,13 +60,13 @@ function declareAnimal(string memory animalName, string memory gender, uint8 age
 
 Le détenteur d'un animal peut décider de le tuer avec ```deadAnimal()``` en burnant :cry:. Il faut alors aussi penser à supprimer l'adresse et les characteristiques dans le mapping.
 
-Si une personne possède 2 animaux de sexes différents il peut alors via la méthode ```breedAnimal()``` les accoupler afin de d'obtenir un nouvel animal agé de 0 année (logique), de charactéristiques héritant des deux parents et de sexes aléatoire.
+Si une personne possède 2 animaux de sexes différents il peut alors via la méthode ```breedAnimal()``` les accoupler afin d'obtenir un nouvel animal agé de 0 année (logique), de charactéristiques héritant des deux parents et de sexes aléatoires.
 
-Bien sûr ces fonctions ne doivent pouvoir être appelé que par le possésseur. C'est pour celà qu'un **modifier** ```onlyAnimalOwner``` vérifie que l'adresse faisant un appel pour un animal donnée le possède bien et ce, en regardant tout simplement dans le ```registerBreeder```.
+Bien sûr ces fonctions ne doivent pouvoir être appelé que par le possesseur. C'est pour celà qu'un **modifier** ```onlyAnimalOwner``` vérifie que l'adresse faisant un appel pour un animal donnée le possède bien et ce, en regardant tout simplement dans le ```registerBreeder```.
 
 ## Combat et mise <a name="combat"></a>
 
-Puisque le fait de pouvoir tuer son animal soit même n'est pas assez drôle on va pouvoir grâce à ce second contrat le faire s'affronter contre celui d'un autre joueur dans un match a mort avec mise :smiling_imp: (Je rigole les défenseurs extrêmiste me tomber pas dessus svp).
+Comme le fait de pouvoir tuer son animal soit même n'est pas assez drôle, on va pouvoir grâce à ce second contrat le faire affronter l'animal d'un autre joueur dans un match a mort avec mise :smiling_imp: (Je rigole les défenseurs extrêmiste me tomber pas dessus svp).
 
 // EXPLIQUER LE FONCTIONNEMENT ICI
 
