@@ -6,7 +6,7 @@
 
 # Présentation <a name="presentation"></a>
 
-Ce smart contract a pour but la création d'un **NFT** de type animal avec différentes charactéristiques. 2 contrats sont déployés, l'[un](contracts/AnimalsWorkd.sol) permet en partie la création de cette nft et de méthodes qui lui sont associés, la [seconde](contracts/AnimalsFight.sol) est un contrat à part permettant aux possesseur d'animaux et de les faire se combattre contre d'autres en plaçant une mise en ether.
+Ce smart contract a pour but la création d'un **NFT** de type animal avec différentes charactéristiques. 2 contrats sont déployés, l'[un](contracts/AnimalsWorld.sol) permet en partie la création de cette nft et de méthodes qui lui sont associés, la [seconde](contracts/AnimalsFight.sol) est un contrat à part permettant aux possesseur d'animaux et de les faire se combattre contre d'autres en plaçant une mise en ether.
 
 L'installation de la librairie openzeppelin ```npm install @openzeppelin/contracts```, permet de simplifier le développement des smart-contracts grâce à l'intégration des standards ERC et leur utilisation direct.
 
