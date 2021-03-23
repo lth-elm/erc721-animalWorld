@@ -32,7 +32,7 @@ Grâce à l'import du fichier *ERC721.sol* de la librairie d'openzeppelin on a p
 
 ## Mon animal <a name="animal"></a>
 
-Toute personne peut en faisant appel au contrat créer son propre *animal* dont les charactéristiques sont enregistrés dans un mapping de la sorte ```mapping(uint256 => animalStruct) public animalCharacteristic``` qui associent la structure d'un animal à son identifiant. De la même manière chaque *identifiant* d'animal est associé à l'*adresse* de son possesseur dans un mapping ```registerBreeder```.
+Toute personne peut en faisant appel au contrat créer son propre *animal* dont les charactéristiques sont enregistrés dans un mapping de la sorte ```mapping(uint256 => animalStruct) public animalCharacteristic``` qui associent la structure d'un animal à son identifiant. De la même manière chaque *identifiant* d'animal est associé à l'*adresse* de son possesseur dans un mapping ***registerBreeder***.
 
 La fonction permettant de créer son animal est la suivante :
 
@@ -58,19 +58,23 @@ function declareAnimal(string memory animalName, string memory gender, uint8 age
 }
 ```
 
-Le détenteur d'un animal peut décider de le tuer avec ```deadAnimal()``` en burnant :cry:. Il faut alors aussi penser à supprimer l'adresse et les characteristiques dans le mapping.
+Le détenteur d'un animal peut décider de le tuer avec ```deadAnimal(uint256 animalId)``` en burnant :cry:. Il faut alors aussi penser à supprimer l'adresse et les characteristiques dans le mapping.
 
-Si une personne possède 2 animaux de sexes différents il peut alors via la méthode ```breedAnimal()``` les accoupler afin d'obtenir un nouvel animal agé de 0 année (logique), de charactéristiques héritant des deux parents et de sexes aléatoires.
+Si une personne possède 2 animaux de sexes différents il peut alors via la méthode ```breedAnimal(string memory newAnimalName, uint256 animal_one, uint256 animal_two)``` les accoupler afin d'obtenir un nouvel animal agé de 0 année (logique), de charactéristiques héritant des deux parents et de sexes aléatoires.
 
-Bien sûr ces fonctions ne doivent pouvoir être appelé que par le possesseur. C'est pour celà qu'un **modifier** ```onlyAnimalOwner``` vérifie que l'adresse faisant un appel pour un animal donnée le possède bien et ce, en regardant tout simplement dans le ```registerBreeder```.
+Bien sûr ces fonctions ne doivent pouvoir être appelé que par le possesseur. C'est pour celà qu'un **modifier** ***onlyAnimalOwner*** vérifie que l'adresse faisant un appel pour un animal donnée le possède bien et ce, en regardant tout simplement dans le ***registerBreeder***.
 
 ## Combat et mise <a name="combat"></a>
 
-Comme le fait de pouvoir tuer son animal soit même n'est pas assez drôle, on va pouvoir grâce à ce second contrat le faire affronter l'animal d'un autre joueur dans un match a mort avec mise :smiling_imp: (Je rigole les défenseurs extrêmiste me tomber pas dessus svp).
+Comme le fait de pouvoir tuer son animal soit même n'est pas assez drôle, on va pouvoir grâce à ce [second contrat](contracts/AnimalsFight.sol) lui faire affronter l'animal d'un autre joueur dans un match a mort avec mise :smiling_imp: (Je rigole les défenseurs extrêmiste me tomber pas dessus svp).
 
-// EXPLIQUER LE FONCTIONNEMENT ICI
+Chaque combattant doit staker une partie de leurs ethers dans le contrat afin de pouvoir participer, ceci permet notamment d'éviter qu'une personne mise une certaine somme puis la vire de son adresse avant le combat afin d'éviter de payer le gagnant. Une fonction ```fallback ()``` permet de recevoir ces ethers et afin d'éviter de parcourir toute la blockchain pour savoir qui a envoyé combien on repertorie alors tout ça dans un nouveau mapping ***stakeInContract***.
 
-.....
+Grace à la fonction ```readyToFight(uint256 animalId, uint256 _stake)```, n'importe quel détenteur d'un animal peut le déclarer prêt à combattre et miser sur une lui une certaine somme inférieur ou égal au nombre d'ether staker dans le contrat. L'id de l'animal et sa mise sont aussi repertorié dans un mapping *id => stake* ***readyToFight_Stake***.
+
+Une seconde personne peut rejoindre un combat en appelant ```agreeToFight(uint256 animalId, uint256 _opponent)``` et déclarer l'animal qu'il souhaiterait faire combattre contre celui déclarer par un autre au préalable (en entrant les id), la mise pour les deux participant sera alors celle enregistré dans ***readyToFight_Stake***. En acceptant de rejoindre un combat cette fonction va automatiquement exécuter ```fight()``` prenant en paramètre les deux identifiants et retourner aléatoirement un vainqueur. L'animal perdant y laissera malheureusement la vie et les la mise du perdant sera alors attribué au gagnant toujours au sein même du contrat en mettant à jour les fonds des adresses dans le mapping ***stakeInContract***.
+
+Idéalement il faudrais ajouter une méthode permettant à un joueur de récupérer les fonds staker qui incluent aussi ses gains. Toutefois la méthode ```_transfer()``` dans un contrat erc721 ne permet pas d'envoyer des ether mais seulement des nft.
 
 # Migration et déploiement <a name="migration"></a>
 
