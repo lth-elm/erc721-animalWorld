@@ -1,14 +1,14 @@
-1. [Présentation](#presentation)
-2. [Fonctions et revue de code](#fonction)
-    1. [Mon animal](#animal)
-    2. [Combat et mise](#combat)
-3. [Migration et déploiement](#migration)
+1. [Presentation](#presentation)
+2. [Functions and code review](#function)
+    1. [My animal](#animal)
+    2. [Fighting and betting](#fight)
+3. [Migration and deployment](#migration)
 
-# Présentation <a name="presentation"></a>
+# Presentation <a name="presentation"></a>
 
-Ce smart contract a pour but la création d'un **NFT** de type animal avec différentes charactéristiques. 2 contrats sont déployés, l'[un](contracts/AnimalsWorld.sol) permet en partie la création de cette nft et de méthodes qui lui sont associés, le [second](contracts/AnimalsFight.sol) est un contrat à part permettant aux possesseur d'animaux et de les faire se combattre contre d'autres en plaçant une mise en ether.
+This smart contract aims to create an animal type **NFT** with various properties. 2 contracts are deployed, [one](contracts/AnimalsWorld.sol) allows the creation of this nft and methods associated with it, the [second](contracts/AnimalsFight.sol) is a separate contract allowing the owner of animals to fight against others by placing a bet in **ether**.
 
-L'installation de la librairie openzeppelin ```npm install @openzeppelin/contracts```, permet de simplifier le développement des smart-contracts grâce à l'intégration des standards ERC et leur utilisation direct.
+The installation of the openzeppelin library ```npm install @openzeppelin/contracts```, simplifies the development of smart-contracts thanks to the integration of ERC standards and their direct use.
 
 ```solidity
 // SPDX-License-Identifier: MIT
@@ -26,15 +26,15 @@ contract AnimalsWorld is ERC721 {
 }
 ```
 
-Grâce à l'import du fichier *ERC721.sol* de la librairie d'openzeppelin on a pu en quelque ligne créer notre premier contrat générant des nft **AnimalsWorld** dont le ticker est '**ANMW**'.
+Thanks to the import of the file *ERC721.sol* from openzeppelin's library we were able to create in a few lines our first contract that generates nft **AnimalsWorld** with the ticker '**ANMW**'.
 
-# Fonctions et revue de code <a name="fonction"></a>
+# Functions and code review <a name="function"></a>
 
-## Mon animal <a name="animal"></a>
+## My animal <a name="animal"></a>
 
-Toute personne peut en faisant appel au contrat créer son propre *animal* dont les charactéristiques sont enregistrés dans un mapping de la sorte ```mapping(uint256 => animalStruct) public animalCharacteristic``` qui associent la structure d'un animal à son identifiant. De la même manière chaque *identifiant* d'animal est associé à l'*adresse* de son possesseur dans un mapping ***registerBreeder***.
+Anyone can use the contract to create his own *animal* for which the characteristics are stored in a mapping of the kind ```mapping(uint256 => animalStruct) public animalCharacteristic``` that associates the structure of an animal with its identifier. Similarly each animal *identifier* is mapped to the *address* of its owner in the ***registerBreeder*** mapping.
 
-La fonction permettant de créer son animal est la suivante :
+The function for creating an animal is the following one :
 
 ```solidity
 function declareAnimal(string memory animalName, string memory gender, uint8 age, uint8 wingsNumber, uint8 legsNumber, uint8 eyesNumber)
@@ -58,24 +58,24 @@ function declareAnimal(string memory animalName, string memory gender, uint8 age
 }
 ```
 
-Le détenteur d'un animal peut décider de le tuer avec ```deadAnimal(uint256 animalId)``` en burnant :cry:. Il faut alors aussi penser à supprimer l'adresse et les characteristiques dans le mapping.
+The owner of an animal can decide to kill it with ```deadAnimal(uint256 animalId)``` by burning it :cry:. It is then necessary to remove the address and the attributes in the mapping.
 
-Si une personne possède 2 animaux de sexes différents il peut alors via la méthode ```breedAnimal(string memory newAnimalName, uint256 animal_one, uint256 animal_two)``` les accoupler afin d'obtenir un nouvel animal agé de 0 année (logique), de charactéristiques héritant des deux parents et de sexes aléatoires.
+If someone owns 2 animals of different genders it is possible via the method ```breedAnimal(string memory newAnimalName, uint256 animal_one, uint256 animal_two)``` to mate them in order to obtain a new animal of random sexe and of 0 years old (which is obvious) with characteristics inherited from both parents.
 
-Bien sûr ces fonctions ne doivent pouvoir être appelé que par le possesseur. C'est pour celà qu'un **modifier** ***onlyAnimalOwner*** vérifie que l'adresse faisant un appel pour un animal donnée le possède bien et ce, en regardant tout simplement dans le ***registerBreeder***.
+Of course these functions can only be called by the owner. That's why a **modifier** ***onlyAnimalOwner*** checks that the address making the call for a given animal really owns it by simply looking in the ***registerBreeder***.
 
-## Combat et mise <a name="combat"></a>
+## Fighting and betting <a name="fight"></a>
 
-Comme le fait de pouvoir tuer son animal soit même n'est pas assez drôle, on va pouvoir grâce à ce [second contrat](contracts/AnimalsFight.sol) lui faire affronter l'animal d'un autre joueur dans un match a mort avec mise :smiling_imp: (Je rigole les défenseurs extrêmiste me tomber pas dessus svp).
+Since being able to kill your own animal is not funny enough, thanks to this [second contract](contracts/AnimalsFight.sol) we will be able to make it fight against the animal of another player in a death match with a stake :smiling_imp: (just kidding, animals extreme defenders please don't pick on me).
 
-Chaque combattant doit staker une partie de leurs ethers dans le contrat afin de pouvoir participer, ceci permet notamment d'éviter qu'une personne mise une certaine somme puis la vire de son adresse avant le combat afin d'éviter de payer le gagnant. Une fonction ```fallback ()``` permet de recevoir ces ethers et afin d'éviter de parcourir toute la blockchain pour savoir qui a envoyé combien on repertorie alors tout ça dans un nouveau mapping ***stakeInContract***.
+Each contestant has to stake some ethers in the contract to be able to compete, this prevents from betting a specific amount of money and then transferring it back to their address just before the fight in order to avoid paying the winner. A ```fallback ()``` function is used to receive these ethers and to avoid going through the whole blockchain to know who sent how much, it is then listed in a new ***stakeInContract*** mapping.
 
-Grace à la fonction ```readyToFight(uint256 animalId, uint256 _stake)```, n'importe quel détenteur d'un animal peut le déclarer prêt à combattre et miser sur une lui une certaine somme inférieur ou égal au nombre d'ether staker dans le contrat. L'id de l'animal et sa mise sont aussi repertorié dans un mapping *id => stake* ***readyToFight_Stake***.
+Thanks to the function ```readyToFight(uint256 animalId, uint256 _stake)```, any owner of an animal can declare it ready to fight and stake on it an amount less than or equal to the number of ether they have staked in the contract. The id of the animal and its stake are also listed in a mapping *id => stake* ***readyToFight_Stake***.
 
-Une seconde personne peut rejoindre un combat en appelant ```agreeToFight(uint256 animalId, uint256 _opponent)``` et déclarer l'animal qu'il souhaiterait faire combattre contre celui déclarer par un autre au préalable (en entrant les id), la mise pour les deux participant sera alors celle enregistré dans ***readyToFight_Stake***. En acceptant de rejoindre un combat cette fonction va automatiquement exécuter ```fight()``` prenant en paramètre les deux identifiants et retourner aléatoirement un vainqueur. L'animal perdant y laissera malheureusement la vie et les la mise du perdant sera alors attribué au gagnant toujours au sein même du contrat en mettant à jour les fonds des adresses dans le mapping ***stakeInContract***.
+A second player can join a fight by calling ```agreeToFight(uint256 animalId, uint256 _opponent)``` and declare the animal he would like to fight against the one declared by another player beforehand (by entering the IDs), the bid for both participants will then be the one registered in ***readyToFight_Stake***. By accepting to join a match this function will automatically execute ```fight()``` and take as parameters the two identifiers and will randomly return a winner. The losing animal will unfortunately perish and the loser's stake will then be awarded to the winner but still within the contract by updating the address funds in the ***stakeInContract*** mapping.
 
-Idéalement il faudrais ajouter une méthode permettant à un joueur de récupérer les fonds staker qui incluent aussi ses gains. Toutefois la méthode ```_transfer()``` dans un contrat erc721 ne permet pas d'envoyer des ether mais seulement des nft.
+ideally we should create a method that would enable a player to retrieve their stakes funds that also include their winnings. However the function ```_transfer()``` in an erc721 contract does not support sending ethers but only nft.
 
-# Migration et déploiement <a name="migration"></a>
+# Migration and deployment <a name="migration"></a>
 
-Voir https://github.com/lth-elm/erc20-ico#migration.
+See https://github.com/lth-elm/erc20-ico#migration.
